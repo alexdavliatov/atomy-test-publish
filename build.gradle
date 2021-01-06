@@ -1,0 +1,76 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = 'dev.atomy'
+version = '0.0.1'
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'atomy-test-publish'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'My Library'
+                description = 'A concise description of my library'
+                url = 'http://www.example.com/library'
+                properties = [
+                    myProp: "value",
+                    "prop.with.dots": "anotherValue"
+                ]
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adavliatov'
+                        name = 'Aleksandr Davliatov'
+                        email = 'alexander.davliatov@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://alexdavliatov/atomy-test-publish.git'
+                    developerConnection = 'scm:git:ssh://alexdavliatov/atomy-test-publish.git'
+                    url = 'https://github.com/alexdavliatov/atomy-test-publish'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "$buildDir/repos/releases"
+            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
